@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Welcome to My Stream IT Webapp
 
 ## Project info
 
