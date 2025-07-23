@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Play, Plus } from "lucide-react";
+import { Play, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useWatchlist } from "@/hooks/useWatchlist";
 
 interface ContentItem {
   id: string;
@@ -9,6 +10,7 @@ interface ContentItem {
   type: "movie" | "tv" | "live";
   rating?: string;
   year?: number;
+  onClick?: () => void;
 }
 
 interface ContentGridProps {
@@ -33,6 +35,8 @@ const ContentGrid = ({ title, items }: ContentGridProps) => {
 };
 
 const ContentCard = ({ item }: { item: ContentItem }) => {
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const inWatchlist = isInWatchlist(item.id);
   return (
     <Card className="group relative overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 hover:scale-105 hover:shadow-glow-primary">
       <div className="aspect-[2/3] relative overflow-hidden">
@@ -47,7 +51,14 @@ const ContentCard = ({ item }: { item: ContentItem }) => {
         
         {/* Play Button */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <Button size="sm" className="bg-primary/90 hover:bg-primary shadow-glow-primary">
+          <Button 
+            size="sm" 
+            className="bg-primary/90 hover:bg-primary shadow-glow-primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              item.onClick?.();
+            }}
+          >
             <Play className="h-4 w-4 mr-1" fill="currentColor" />
             Play
           </Button>
@@ -71,8 +82,16 @@ const ContentCard = ({ item }: { item: ContentItem }) => {
           size="icon"
           variant="ghost"
           className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleWatchlist(item);
+          }}
         >
-          <Plus className="h-4 w-4" />
+          {inWatchlist ? (
+            <Check className="h-4 w-4 text-green-400" />
+          ) : (
+            <Plus className="h-4 w-4" />
+          )}
         </Button>
       </div>
       
