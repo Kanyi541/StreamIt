@@ -53,6 +53,7 @@ const Header = ({ onSearch }: HeaderProps) => {
                 IPTV-LIVE TV
               </Button>
             </a>
+
             <a href="/my-list">
               <Button 
                 variant="ghost" 
