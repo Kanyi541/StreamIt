@@ -45,25 +45,14 @@ const Header = ({ onSearch }: HeaderProps) => {
                 Home
               </Button>
             </a>
-            <a href="/movies">
-              <Button 
-                variant="ghost" 
-                className={`${isActive('/movies') ? 'text-primary' : 'text-foreground'} hover:text-primary`}
-              >
-                Movies
-              </Button>
-            </a>
             <a href="/live-tv">
               <Button 
                 variant="ghost" 
                 className={`${isActive('/live-tv') ? 'text-primary' : 'text-foreground'} hover:text-primary`}
               >
-                IPTV
+                IPTV-LIVE TV
               </Button>
             </a>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              TV Shows
-            </Button>
             <a href="/my-list">
               <Button 
                 variant="ghost" 
