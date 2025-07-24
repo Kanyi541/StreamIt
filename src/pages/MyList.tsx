@@ -10,7 +10,11 @@ const MyList = () => {
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
   const handlePlayContent = (content: any) => {
-    setSelectedContent(content);
+    // Mark content as coming from watchlist for full movie playback
+    setSelectedContent({
+      ...content,
+      isFromWatchlist: true
+    });
     setIsPlayerOpen(true);
   };
 
@@ -53,7 +57,10 @@ const MyList = () => {
 
       {selectedContent && (
         <VideoPlayer
-          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          src={selectedContent.isFromWatchlist 
+            ? `https://vidsrc.to/embed/movie/${selectedContent.tmdbId || selectedContent.id}` 
+            : "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          }
           title={selectedContent.title}
           isOpen={isPlayerOpen}
           onClose={() => {

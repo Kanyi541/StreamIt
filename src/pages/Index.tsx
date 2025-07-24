@@ -73,6 +73,7 @@ const Index = () => {
     image: tmdbService.getImageUrl(movie.poster_path),
     rating: movie.vote_average.toFixed(1),
     year: new Date(movie.release_date).getFullYear(),
+    tmdbId: movie.id, // Store TMDB ID for watchlist
     onClick: () => handlePlayContent(movie)
   }));
 
@@ -83,6 +84,7 @@ const Index = () => {
     image: tmdbService.getImageUrl(show.poster_path),
     rating: show.vote_average.toFixed(1),
     year: new Date(show.first_air_date).getFullYear(),
+    tmdbId: show.id, // Store TMDB ID for watchlist
     onClick: () => handlePlayContent(show)
   }));
 
@@ -170,7 +172,12 @@ const Index = () => {
 
       {selectedContent && (
         <VideoPlayer
-          src={selectedContent.trailerUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
+          src={selectedContent.isFromWatchlist 
+            ? (selectedContent.type === 'movie' 
+                ? `https://vidsrc.to/embed/movie/${selectedContent.tmdbId || selectedContent.id}`
+                : `https://vidsrc.to/embed/tv/${selectedContent.tmdbId || selectedContent.id}`)
+            : (selectedContent.trailerUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+          }
           title={selectedContent.title || selectedContent.name}
           isOpen={isPlayerOpen}
           onClose={() => {

@@ -7,6 +7,8 @@ interface WatchlistItem {
   image: string;
   year?: number;
   rating?: string;
+  tmdbId?: number; // Add TMDB ID for fetching full movie content
+  isFromWatchlist?: boolean; // Flag to indicate it's from watchlist
 }
 
 export const useWatchlist = () => {
