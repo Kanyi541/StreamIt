@@ -3,6 +3,7 @@ import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { tmdbService } from "@/services/tmdb";
 
 interface SearchResult {
   id: string;
@@ -23,22 +24,26 @@ const SearchModal = ({ isOpen, onClose, onSelectContent }: SearchModalProps) => 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
 
-  // Mock search data - replace with real API
-  const mockData: SearchResult[] = [
-    { id: "1", title: "The Dark Knight", type: "movie", image: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=300&h=450&fit=crop", year: 2008, rating: "9.0" },
-    { id: "2", title: "Inception", type: "movie", image: "https://images.unsplash.com/photo-1489599456549-5d5a4dc8e4ec?w=300&h=450&fit=crop", year: 2010, rating: "8.8" },
-    { id: "3", title: "Breaking Bad", type: "tv", image: "https://images.unsplash.com/photo-1549012443-07b4b0ee3ac8?w=300&h=450&fit=crop", year: 2008, rating: "9.5" },
-    { id: "4", title: "CNN News", type: "live", image: "https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=300&h=450&fit=crop" },
-    { id: "5", title: "Stranger Things", type: "tv", image: "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=300&h=450&fit=crop", year: 2016, rating: "8.7" },
-  ];
-
-  const handleSearch = (searchQuery: string) => {
+  const handleSearch = async (searchQuery: string) => {
     setQuery(searchQuery);
     if (searchQuery.trim()) {
-      const filtered = mockData.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setResults(filtered);
+      try {
+        const searchResults = await tmdbService.search(searchQuery);
+        const formatted = searchResults.map(item => ({
+          id: item.id.toString(),
+          title: 'title' in item ? item.title : item.name,
+          type: 'title' in item ? 'movie' as const : 'tv' as const,
+          image: tmdbService.getImageUrl(item.poster_path),
+          year: 'title' in item 
+            ? new Date(item.release_date).getFullYear() 
+            : new Date(item.first_air_date).getFullYear(),
+          rating: item.vote_average.toFixed(1)
+        }));
+        setResults(formatted);
+      } catch (error) {
+        console.error('Search error:', error);
+        setResults([]);
+      }
     } else {
       setResults([]);
     }

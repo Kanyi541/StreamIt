@@ -5,7 +5,11 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import SearchModal from "./SearchModal";
 
-const Header = () => {
+interface HeaderProps {
+  onSearch?: () => void;
+}
+
+const Header = ({ onSearch }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
@@ -77,7 +81,10 @@ const Header = () => {
               <Input
                 placeholder="Search movies, shows..."
                 className="pl-10 w-64 bg-secondary border-border cursor-pointer"
-                onClick={() => setIsSearchOpen(true)}
+                onClick={() => {
+                  setIsSearchOpen(true);
+                  onSearch?.();
+                }}
                 readOnly
               />
             </div>
@@ -85,7 +92,10 @@ const Header = () => {
               size="icon" 
               variant="ghost" 
               className="sm:hidden"
-              onClick={() => setIsSearchOpen(true)}
+              onClick={() => {
+                setIsSearchOpen(true);
+                onSearch?.();
+              }}
             >
               <Search className="h-5 w-5" />
             </Button>

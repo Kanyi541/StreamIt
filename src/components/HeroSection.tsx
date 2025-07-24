@@ -2,13 +2,25 @@ import { Play, Plus, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  title?: string;
+  description?: string;
+  backgroundImage?: string;
+  onPlay?: () => void;
+}
+
+const HeroSection = ({ 
+  title = "Stream Your Favorite Content", 
+  description = "Discover thousands of movies, TV shows, and live IPTV channels. Your entertainment universe awaits.",
+  backgroundImage,
+  onPlay
+}: HeroSectionProps) => {
   return (
     <section className="relative h-screen w-full overflow-hidden">
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroBg})` }}
+        style={{ backgroundImage: `url(${backgroundImage || heroBg})` }}
       />
       
       {/* Gradient Overlay */}
@@ -19,21 +31,29 @@ const HeroSection = () => {
       <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
         <div className="max-w-2xl space-y-6">
           <h1 className="text-5xl md:text-7xl font-bold leading-tight">
-            Stream Your
-            <span className="block bg-gradient-primary bg-clip-text text-transparent">
-              Favorite Content
-            </span>
+            {title.includes(' ') ? (
+              <>
+                {title.split(' ').slice(0, -1).join(' ')}
+                <span className="block bg-gradient-primary bg-clip-text text-transparent">
+                  {title.split(' ').slice(-1)}
+                </span>
+              </>
+            ) : (
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                {title}
+              </span>
+            )}
           </h1>
           
           <p className="text-xl text-muted-foreground max-w-lg">
-            Discover thousands of movies, TV shows, and live IPTV channels. 
-            Your entertainment universe awaits.
+            {description}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
             <Button 
               size="lg" 
               className="bg-primary hover:bg-primary/90 shadow-glow-primary transition-all duration-300 hover:scale-105"
+              onClick={onPlay}
             >
               <Play className="mr-2 h-5 w-5" fill="currentColor" />
               Watch Now

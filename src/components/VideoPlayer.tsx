@@ -18,13 +18,16 @@ const VideoPlayer = ({ src, title, onClose, isOpen }: VideoPlayerProps) => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [showControls, setShowControls] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const isYouTube = src.includes('youtube.com/embed');
 
   useEffect(() => {
-    if (isOpen && videoRef.current) {
+    if (isOpen && !isYouTube && videoRef.current) {
       videoRef.current.play();
       setIsPlaying(true);
     }
-  }, [isOpen]);
+  }, [isOpen, isYouTube]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -96,23 +99,45 @@ const VideoPlayer = ({ src, title, onClose, isOpen }: VideoPlayerProps) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      <video
-        ref={videoRef}
-        className="w-full h-full object-contain"
-        src={src}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onMouseMove={() => setShowControls(true)}
-        onClick={togglePlay}
-      />
+      {isYouTube ? (
+        <iframe
+          className="w-full h-full"
+          src={src}
+          title={title}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          onLoad={() => setIsLoading(false)}
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          className="w-full h-full object-contain"
+          src={src}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onMouseMove={() => setShowControls(true)}
+          onClick={togglePlay}
+          onLoadStart={() => setIsLoading(true)}
+          onLoadedData={() => setIsLoading(false)}
+        />
+      )}
 
-      {/* Controls Overlay */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/50 transition-opacity duration-300 ${
-          showControls ? 'opacity-100' : 'opacity-0'
-        }`}
-        onMouseMove={() => setShowControls(true)}
-      >
+      {/* Loading indicator */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-primary"></div>
+        </div>
+      )}
+
+      {/* Controls Overlay - Hide for YouTube */}
+      {!isYouTube && (
+        <div
+          className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/50 transition-opacity duration-300 ${
+            showControls ? 'opacity-100' : 'opacity-0'
+          }`}
+          onMouseMove={() => setShowControls(true)}
+        >
         {/* Top Bar */}
         <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold">{title}</h1>
@@ -231,6 +256,21 @@ const VideoPlayer = ({ src, title, onClose, isOpen }: VideoPlayerProps) => {
           </div>
         </div>
       </div>
+      )}
+
+      {/* Close button for YouTube videos */}
+      {isYouTube && (
+        <div className="absolute top-6 right-6 z-10">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={onClose}
+            className="bg-black/50 hover:bg-black/70 text-white"
+          >
+            <X className="h-6 w-6" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
