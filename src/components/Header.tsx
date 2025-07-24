@@ -102,13 +102,9 @@ const Header = ({ onSearch }: HeaderProps) => {
               <a href="/">
                 <Button variant="ghost" className="justify-start w-full">Home</Button>
               </a>
-              <a href="/movies">
-                <Button variant="ghost" className="justify-start w-full">Movies</Button>
-              </a>
               <a href="/live-tv">
                 <Button variant="ghost" className="justify-start w-full">IPTV</Button>
               </a>
-              <Button variant="ghost" className="justify-start w-full">TV Shows</Button>
               <a href="/my-list">
                 <Button variant="ghost" className="justify-start w-full">My List</Button>
               </a>

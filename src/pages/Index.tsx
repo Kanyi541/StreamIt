@@ -176,27 +176,35 @@ const Index = () => {
       </main>
 
       <SearchModal 
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSelectContent={handleSelectContent}
-      />
+  isOpen={isSearchOpen}
+  onClose={() => setIsSearchOpen(false)}
+  onSelectContent={(content: any) => {
+    const enrichedContent = {
+      ...content,
+      isFromWatchlist: true, // ✅ treat searched content like watchlist content
+    };
+    setSelectedContent(enrichedContent);
+    setIsPlayerOpen(true);
+  }}
+/>
 
-      {selectedContent && (
-        <VideoPlayer
-          src={selectedContent.isFromWatchlist 
-            ? (selectedContent.type === 'movie' 
-                ? `https://vidsrc.to/embed/movie/${selectedContent.tmdbId || selectedContent.id}`
-                : `https://vidsrc.to/embed/tv/${selectedContent.tmdbId || selectedContent.id}`)
-            : (selectedContent.trailerUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
-          }
-          title={selectedContent.title || selectedContent.name}
-          isOpen={isPlayerOpen}
-          onClose={() => {
-            setIsPlayerOpen(false);
-            setSelectedContent(null);
-          }}
-        />
-      )}
+{selectedContent && (
+  <VideoPlayer
+    src={
+      selectedContent.isFromWatchlist 
+        ? (selectedContent.type === 'movie' 
+            ? `https://vidsrc.to/embed/movie/${selectedContent.tmdbId || selectedContent.id}`
+            : `https://vidsrc.to/embed/tv/${selectedContent.tmdbId || selectedContent.id}`)
+        : (selectedContent.trailerUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+    }
+    title={selectedContent.title || selectedContent.name}
+    isOpen={isPlayerOpen}
+    onClose={() => {
+      setIsPlayerOpen(false);
+      setSelectedContent(null);
+    }}
+  />
+)}
     </div>
   );
 };
