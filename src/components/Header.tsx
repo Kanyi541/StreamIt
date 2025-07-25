@@ -1,9 +1,19 @@
-import { Search, Menu, User } from "lucide-react";
+import { Search, Menu, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SearchModal from "./SearchModal";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { signOut } from "firebase/auth";
 
 interface HeaderProps {
   onSearch?: () => void;
@@ -13,8 +23,14 @@ const Header = ({ onSearch }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
+  const [user] = useAuthState(auth);
+  const navigate = useNavigate();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -53,7 +69,6 @@ const Header = ({ onSearch }: HeaderProps) => {
                 IPTV-LIVE TV
               </Button>
             </a>
-
             <a href="/my-list">
               <Button 
                 variant="ghost" 
@@ -89,9 +104,46 @@ const Header = ({ onSearch }: HeaderProps) => {
             >
               <Search className="h-5 w-5" />
             </Button>
-            <Button size="icon" variant="ghost">
-              <User className="h-5 w-5" />
-            </Button>
+
+            {/* ✅ Profile Button with Tooltip + Dropdown */}
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="icon" variant="ghost" className="relative">
+                      {user ? (
+                        user.photoURL ? (
+                          <img
+                            src={user.photoURL}
+                            alt="Profile"
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : user.email ? (
+                          <span className="w-8 h-8 rounded-full bg-gray-300 text-black flex items-center justify-center font-semibold uppercase text-sm">
+                            {user.email.charAt(0)}
+                          </span>
+                        ) : (
+                          <UserIcon className="h-5 w-5" />
+                        )
+                      ) : (
+                        <UserIcon className="h-5 w-5" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>{user?.email || "Account"}</p>
+                </TooltipContent>
+              </Tooltip>
+
+              {user && (
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              )}
+            </DropdownMenu>
           </div>
         </div>
 
