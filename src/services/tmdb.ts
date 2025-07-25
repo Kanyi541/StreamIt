@@ -2,6 +2,47 @@ const TMDB_API_KEY = '07093a6aaed5e454e20052e4ce3ebf5c';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
+// At the top of your file or before any function
+export type TVShowWithEpisodeInfo = TMDBTVShow & {
+  season: number;
+  episode: number;
+};
+
+// Function to fetch popular shows with episode info
+export const getPopularTVShowsWithEpisodeInfo = async (): Promise<TVShowWithEpisodeInfo[]> => {
+  const response = await fetch(
+    `${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`
+  );
+  const data = await response.json();
+  const popularShows: TMDBTVShow[] = data.results;
+
+  const enrichedShows: TVShowWithEpisodeInfo[] = await Promise.all(
+    popularShows.map(async (show) => {
+      try {
+        const seasonResponse = await fetch(
+          `${TMDB_BASE_URL}/tv/${show.id}/season/1?api_key=${TMDB_API_KEY}&language=en-US`
+        );
+        const seasonData = await seasonResponse.json();
+        const firstEpisode = seasonData.episodes?.[0]?.episode_number || 1;
+
+        return {
+          ...show,
+          season: 1,
+          episode: firstEpisode,
+        };
+      } catch (error) {
+        return {
+          ...show,
+          season: 1,
+          episode: 1,
+        };
+      }
+    })
+  );
+
+  return enrichedShows;
+};
+
 export interface TMDBMovie {
   id: number;
   title: string;
