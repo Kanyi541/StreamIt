@@ -64,6 +64,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
             />
             <input
               type="password"
@@ -72,6 +73,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete={isRegister ? "new-password" : "current-password"}
             />
             <button
               type="submit"
@@ -84,17 +86,16 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
           <div className="text-center my-4 text-sm text-white">or</div>
 
           <button
-  onClick={handleGoogleSignIn}
-  className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 rounded hover:bg-gray-100 transition"
->
-  <img
-    src="https://www.svgrepo.com/show/355037/google.svg"
-    alt="Google"
-    className="h-5 w-5"
-  />
-  Sign in with Google
-</button>
-
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 rounded hover:bg-gray-100 transition"
+          >
+            <img
+              src="https://www.svgrepo.com/show/355037/google.svg"
+              alt="Google"
+              className="h-5 w-5"
+            />
+            Sign in with Google
+          </button>
 
           <p className="mt-4 text-center text-sm text-white">
             {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
@@ -110,7 +111,6 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // ✅ This part renders the profile button
   return (
     <>
       <div className="absolute top-4 right-4 z-50">
