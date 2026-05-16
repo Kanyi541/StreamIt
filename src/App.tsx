@@ -3,7 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { analytics } from "@/firebase";
+import { logEvent } from "firebase/analytics";
 
 import Index from "./pages/Index";
 import Movies from "./pages/Movies";
@@ -14,6 +17,20 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function AnalyticsListener() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (analytics) {
+      logEvent(analytics, 'page_view', {
+        page_path: location.pathname + location.search,
+      });
+    }
+  }, [location]);
+
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -21,6 +38,7 @@ function App() {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <AnalyticsListener />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/movies" element={<Movies />} />

@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Pause, Play } from "lucide-react";
 import Hls from "hls.js";
+import { analytics } from "@/firebase";
+import { logEvent } from "firebase/analytics";
 
 interface VideoPlayerProps {
   src: string;
+  title?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const VideoPlayer = ({ src, isOpen, onClose }: VideoPlayerProps) => {
+const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +29,16 @@ const VideoPlayer = ({ src, isOpen, onClose }: VideoPlayerProps) => {
       setSeason(1);
       setEpisode(1);
       return;
+    }
+
+    if (analytics) {
+      logEvent(analytics, 'select_content', {
+        content_type: isTV ? 'tv_show' : 'movie',
+        content_id: src,
+        item_name: title || 'Unknown Content',
+        season: isTV ? season : undefined,
+        episode: isTV ? episode : undefined,
+      });
     }
 
     setIsLoading(true);

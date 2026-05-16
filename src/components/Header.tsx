@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { signOut } from "firebase/auth";
+import { logEvent } from "firebase/analytics";
+import { analytics } from "@/firebase";
 
 interface HeaderProps {
   onSearch?: () => void;
@@ -30,6 +32,9 @@ const Header = ({ onSearch }: HeaderProps) => {
 
   const handleSignOut = async () => {
     await signOut(auth);
+    if (analytics) {
+      logEvent(analytics, 'logout');
+    }
   };
 
   return (

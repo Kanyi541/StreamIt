@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { tmdbService } from "@/services/tmdb";
+import { analytics } from "@/firebase";
+import { logEvent } from "firebase/analytics";
 
 interface SearchResult {
   id: string;
@@ -86,6 +88,14 @@ const SearchModal = ({ isOpen, onClose, onSelectContent }: SearchModalProps) => 
                   key={result.id}
                   className="cursor-pointer hover:bg-secondary transition-colors"
                   onClick={() => {
+                    if (analytics) {
+                      logEvent(analytics, 'search', { search_term: query });
+                      logEvent(analytics, 'select_content', {
+                        content_type: result.type,
+                        item_id: result.id,
+                        item_name: result.title
+                      });
+                    }
                     onSelectContent(result);
                     onClose();
                   }}
