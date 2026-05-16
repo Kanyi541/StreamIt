@@ -39,22 +39,9 @@ const Index = () => {
   }, []);
 
   const handlePlayContent = async (content: any) => {
-    try {
-      const videos = content.title 
-        ? await tmdbService.getMovieVideos(content.id)
-        : await tmdbService.getTVVideos(content.id);
-      
-      const trailerUrl = tmdbService.getTrailerUrl(videos);
-      setSelectedContent({
-        ...content,
-        trailerUrl
-      });
-      setIsPlayerOpen(true);
-    } catch (error) {
-      console.error('Error fetching trailer:', error);
-      setSelectedContent(content);
-      setIsPlayerOpen(true);
-    }
+    // Always play the actual movie/show instead of a trailer
+    setSelectedContent(content);
+    setIsPlayerOpen(true);
   };
 
   const handleSearch = () => {
@@ -191,11 +178,11 @@ const Index = () => {
 {selectedContent && (
   <VideoPlayer
     src={
-      selectedContent.isFromWatchlist 
-        ? (selectedContent.type === 'movie' 
-            ? `https://vidsrc.to/embed/movie/${selectedContent.tmdbId || selectedContent.id}`
-            : `https://vidsrc.to/embed/tv/${selectedContent.tmdbId || selectedContent.id}`)
-        : (selectedContent.trailerUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+      selectedContent.type === 'live'
+        ? selectedContent.streamUrl
+        : (selectedContent.type === 'tv' || selectedContent.media_type === 'tv'
+            ? `https://vidsrc.me/embed/tv?tmdb=${selectedContent.tmdbId || selectedContent.id}&season=1&episode=1`
+            : `https://vidsrc.me/embed/movie?tmdb=${selectedContent.tmdbId || selectedContent.id}`)
     }
     title={selectedContent.title || selectedContent.name}
     isOpen={isPlayerOpen}

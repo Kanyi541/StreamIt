@@ -57,9 +57,12 @@ const MyList = () => {
 
       {selectedContent && (
         <VideoPlayer
-          src={selectedContent.isFromWatchlist 
-            ? `https://vidsrc.to/embed/movie/${selectedContent.tmdbId || selectedContent.id}` 
-            : "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          src={
+            selectedContent.type === 'live'
+              ? selectedContent.streamUrl
+              : (selectedContent.type === 'tv' || selectedContent.media_type === 'tv'
+                  ? `https://vidsrc.me/embed/tv?tmdb=${selectedContent.tmdbId || selectedContent.id}&season=1&episode=1`
+                  : `https://vidsrc.me/embed/movie?tmdb=${selectedContent.tmdbId || selectedContent.id}`)
           }
           title={selectedContent.title}
           isOpen={isPlayerOpen}
