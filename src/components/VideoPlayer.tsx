@@ -14,12 +14,19 @@ const VideoPlayer = ({ src, isOpen, onClose }: VideoPlayerProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [embedSrc, setEmbedSrc] = useState("");
+  const [season, setSeason] = useState(1);
+  const [episode, setEpisode] = useState(1);
 
   // Detect if it's an iframe-embed-only source
   const isIframeSrc = /youtube\.com|youtu\.be|vidsrc|1asb\.com|embed/.test(src);
+  const isTV = src.includes('vidsrc.me/embed/tv');
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setSeason(1);
+      setEpisode(1);
+      return;
+    }
 
     setIsLoading(true);
     setHasError(false);
@@ -28,9 +35,13 @@ const VideoPlayer = ({ src, isOpen, onClose }: VideoPlayerProps) => {
       // Handle YouTube links
       const youtubeMatch = src.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
       const videoId = youtubeMatch?.[1];
-      const embedUrl = videoId
+      let embedUrl = videoId
         ? `https://www.youtube.com/embed/${videoId}?autoplay=1`
         : src;
+
+      if (embedUrl.includes('vidsrc.me/embed/tv')) {
+        embedUrl = embedUrl.replace(/&season=\d+&episode=\d+/, `&season=${season}&episode=${episode}`);
+      }
 
       setEmbedSrc(embedUrl);
       setIsLoading(false);
@@ -67,7 +78,7 @@ const VideoPlayer = ({ src, isOpen, onClose }: VideoPlayerProps) => {
       console.error("HLS not supported in this browser");
       setHasError(true);
     }
-  }, [src, isOpen]);
+  }, [src, isOpen, season, episode]);
 
   const handlePlayPause = () => {
     const video = videoRef.current;
@@ -96,6 +107,29 @@ const VideoPlayer = ({ src, isOpen, onClose }: VideoPlayerProps) => {
         {hasError && (
           <div className="absolute inset-0 flex items-center justify-center text-red-500 text-center p-4">
             ⚠️ Failed to load stream. This could be a CORS or unsupported format issue.
+          </div>
+        )}
+
+        {isTV && !hasError && (
+          <div className="absolute top-4 left-4 z-50 flex gap-2">
+            <select 
+              value={season} 
+              onChange={(e) => setSeason(Number(e.target.value))}
+              className="bg-black/80 text-white px-3 py-1.5 rounded border border-white/20 focus:outline-none focus:border-primary text-sm backdrop-blur-sm"
+            >
+              {[...Array(20)].map((_, i) => (
+                <option key={i+1} value={i+1}>Season {i+1}</option>
+              ))}
+            </select>
+            <select 
+              value={episode} 
+              onChange={(e) => setEpisode(Number(e.target.value))}
+              className="bg-black/80 text-white px-3 py-1.5 rounded border border-white/20 focus:outline-none focus:border-primary text-sm backdrop-blur-sm"
+            >
+              {[...Array(50)].map((_, i) => (
+                <option key={i+1} value={i+1}>Episode {i+1}</option>
+              ))}
+            </select>
           </div>
         )}
 

@@ -155,8 +155,8 @@ const Index = () => {
             <div className="space-y-12 pb-12">
               <ContentGrid title="Trending Now" items={formatMovies(trendingMovies)} />
               <ContentGrid title="Popular Movies" items={formatMovies(popularMovies)} />
-              <ContentGrid title="Live TV Channels" items={liveChannels} />
               <ContentGrid title="Popular TV Shows" items={formatTVShows(popularTVShows)} />
+              <ContentGrid title="Live TV Channels" items={liveChannels} />
             </div>
           </>
         )}

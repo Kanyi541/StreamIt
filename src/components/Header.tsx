@@ -41,7 +41,7 @@ const Header = ({ onSearch }: HeaderProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="lg:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <Menu className="h-6 w-6" />
@@ -52,30 +52,42 @@ const Header = ({ onSearch }: HeaderProps) => {
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-2 xl:space-x-6">
             <a href="/">
-              <Button 
-                variant="ghost" 
-                className={`${isActive('/') ? 'text-primary' : 'text-foreground'} hover:text-primary`}
-              >
-                Home
-              </Button>
+              <Button variant="ghost" className={`${isActive('/') ? 'text-primary' : 'text-foreground'} hover:text-primary`}>Home</Button>
             </a>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-foreground hover:text-primary">Genre</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 max-h-96 overflow-y-auto">
+                {['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Thriller', 'Documentary', 'Animation'].map(genre => (
+                  <DropdownMenuItem key={genre}>{genre}</DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-foreground hover:text-primary">Country</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 max-h-96 overflow-y-auto">
+                {['United States', 'United Kingdom', 'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia', 'Botswana', 'Brazil', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cambodia', 'Cameroon', 'Canada', 'Chad', 'Chile', 'China', 'Colombia', 'Congo', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Denmark', 'Djibouti', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Estonia', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kuwait', 'Lebanon', 'Libya', 'Madagascar', 'Malaysia', 'Mali', 'Mexico', 'Morocco', 'Nepal', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Oman', 'Pakistan', 'Panama', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Saudi Arabia', 'Senegal', 'Serbia', 'Singapore', 'Somalia', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'Sudan', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tanzania', 'Thailand', 'Tunisia', 'Turkey', 'Uganda', 'Ukraine', 'United Arab Emirates', 'Uruguay', 'Uzbekistan', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'].map(country => (
+                  <DropdownMenuItem key={country}>{country}</DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="ghost" className="text-foreground hover:text-primary">Movies</Button>
+            <Button variant="ghost" className="text-foreground hover:text-primary">TV-Series</Button>
+            <Button variant="ghost" className="text-foreground hover:text-primary">Updates</Button>
+
             <a href="/live-tv">
-              <Button 
-                variant="ghost" 
-                className={`${isActive('/live-tv') ? 'text-primary' : 'text-foreground'} hover:text-primary`}
-              >
-                IPTV-LIVE TV
-              </Button>
+              <Button variant="ghost" className={`${isActive('/live-tv') ? 'text-primary' : 'text-foreground'} hover:text-primary`}>IPTV</Button>
             </a>
             <a href="/my-list">
-              <Button 
-                variant="ghost" 
-                className={`${isActive('/my-list') ? 'text-primary' : 'text-foreground'} hover:text-primary`}
-              >
-                My List
-              </Button>
+              <Button variant="ghost" className={`${isActive('/my-list') ? 'text-primary' : 'text-foreground'} hover:text-primary`}>My List</Button>
             </a>
           </nav>
 
@@ -149,17 +161,16 @@ const Header = ({ onSearch }: HeaderProps) => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-border">
-            <nav className="flex flex-col space-y-2 pt-4">
-              <a href="/">
-                <Button variant="ghost" className="justify-start w-full">Home</Button>
-              </a>
-              <a href="/live-tv">
-                <Button variant="ghost" className="justify-start w-full">IPTV</Button>
-              </a>
-              <a href="/my-list">
-                <Button variant="ghost" className="justify-start w-full">My List</Button>
-              </a>
+          <div className="lg:hidden mt-4 pb-4 border-t border-border">
+            <nav className="flex flex-col space-y-2 pt-4 max-h-64 overflow-y-auto">
+              <a href="/"><Button variant="ghost" className="justify-start w-full">Home</Button></a>
+              <Button variant="ghost" className="justify-start w-full">Genre</Button>
+              <Button variant="ghost" className="justify-start w-full">Country</Button>
+              <Button variant="ghost" className="justify-start w-full">Movies</Button>
+              <Button variant="ghost" className="justify-start w-full">TV-Series</Button>
+              <Button variant="ghost" className="justify-start w-full">Updates</Button>
+              <a href="/live-tv"><Button variant="ghost" className="justify-start w-full">IPTV</Button></a>
+              <a href="/my-list"><Button variant="ghost" className="justify-start w-full">My List</Button></a>
             </nav>
           </div>
         )}
