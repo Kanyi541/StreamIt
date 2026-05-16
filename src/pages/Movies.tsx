@@ -66,7 +66,7 @@ const Movies = () => {
             </p>
           </div>
 
-          <div className="flex flex-nowrap md:flex-wrap gap-4 mb-8 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+          <div className="flex flex-wrap gap-4 mb-8">
             <Button variant={!genreId ? "default" : "outline"} onClick={() => navigate('/movies')}>All Movies</Button>
             <Button variant={genreId === '28' ? "default" : "outline"} onClick={() => navigate('/movies?genre=28&name=Action')}>Action</Button>
             <Button variant={genreId === '35' ? "default" : "outline"} onClick={() => navigate('/movies?genre=35&name=Comedy')}>Comedy</Button>

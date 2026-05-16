@@ -67,7 +67,7 @@ const TVSeries = () => {
             </p>
           </div>
 
-          <div className="flex flex-nowrap md:flex-wrap gap-4 mb-8 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+          <div className="flex flex-wrap gap-4 mb-8">
             <Button variant={!genreId ? "default" : "outline"} onClick={() => navigate('/tv-series')}>All TV-Series</Button>
             <Button variant={genreId === '10759' ? "default" : "outline"} onClick={() => navigate('/tv-series?genre=10759&name=Action%20%26%20Adventure')}>Action</Button>
             <Button variant={genreId === '35' ? "default" : "outline"} onClick={() => navigate('/tv-series?genre=35&name=Comedy')}>Comedy</Button>
