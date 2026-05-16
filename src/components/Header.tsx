@@ -184,10 +184,16 @@ const Header = ({ onSearch }: HeaderProps) => {
               </Tooltip>
 
               {user && (
-                <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuContent align="end" className="w-48">
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground border-b border-border mb-1 truncate">
+                    {user.email}
+                  </div>
                   <DropdownMenuItem onClick={handleSignOut}>
                     Sign Out
                   </DropdownMenuItem>
+                  <div className="px-2 py-1.5 text-[10px] text-muted-foreground/50 text-right mt-1">
+                    v1.3.5
+                  </div>
                 </DropdownMenuContent>
               )}
             </DropdownMenu>
@@ -198,13 +204,16 @@ const Header = ({ onSearch }: HeaderProps) => {
         {isMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 border-t border-border">
             <nav className="flex flex-col space-y-2 pt-4 max-h-64 overflow-y-auto">
-              <a href="/"><Button variant="ghost" className="justify-start w-full">Home</Button></a>
-              <Button variant="ghost" className="justify-start w-full">Genre</Button>
-              <Button variant="ghost" className="justify-start w-full">Movies</Button>
-              <Button variant="ghost" className="justify-start w-full">TV-Series</Button>
-              <a href="/live-tv"><Button variant="ghost" className="justify-start w-full">IPTV</Button></a>
-              <a href="/my-list"><Button variant="ghost" className="justify-start w-full">My List</Button></a>
+              <a href="/" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">Home</Button></a>
+              <a href="/movies" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">Movies</Button></a>
+              <a href="/tv-series" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">TV-Series</Button></a>
+              <a href="/live-tv" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">IPTV</Button></a>
+              <a href="/my-list" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">My List</Button></a>
             </nav>
+            <div className="mt-4 pt-4 border-t border-border flex justify-between items-center px-4">
+              <span className="text-xs text-muted-foreground">stream-it-mocha v1.3.5</span>
+              {user && <span className="text-xs text-muted-foreground truncate max-w-[150px]">{user.email}</span>}
+            </div>
           </div>
         )}
       </div>
