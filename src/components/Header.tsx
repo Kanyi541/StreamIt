@@ -83,17 +83,6 @@ const Header = ({ onSearch }: HeaderProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-foreground hover:text-primary">Country</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 max-h-96 overflow-y-auto">
-                {['United States', 'United Kingdom', 'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia', 'Botswana', 'Brazil', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cambodia', 'Cameroon', 'Canada', 'Chad', 'Chile', 'China', 'Colombia', 'Congo', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Denmark', 'Djibouti', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Estonia', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kuwait', 'Lebanon', 'Libya', 'Madagascar', 'Malaysia', 'Mali', 'Mexico', 'Morocco', 'Nepal', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Oman', 'Pakistan', 'Panama', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Saudi Arabia', 'Senegal', 'Serbia', 'Singapore', 'Somalia', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'Sudan', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tanzania', 'Thailand', 'Tunisia', 'Turkey', 'Uganda', 'Ukraine', 'United Arab Emirates', 'Uruguay', 'Uzbekistan', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'].map(country => (
-                  <DropdownMenuItem key={country}>{country}</DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             <a href="/movies">
               <Button variant="ghost" className={`${isActive('/movies') ? 'text-primary' : 'text-foreground'} hover:text-primary`}>Movies</Button>
             </a>
@@ -123,7 +112,6 @@ const Header = ({ onSearch }: HeaderProps) => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="ghost" className="text-foreground hover:text-primary">Updates</Button>
 
             <a href="/live-tv">
               <Button variant="ghost" className={`${isActive('/live-tv') ? 'text-primary' : 'text-foreground'} hover:text-primary`}>IPTV</Button>
@@ -207,10 +195,8 @@ const Header = ({ onSearch }: HeaderProps) => {
             <nav className="flex flex-col space-y-2 pt-4 max-h-64 overflow-y-auto">
               <a href="/"><Button variant="ghost" className="justify-start w-full">Home</Button></a>
               <Button variant="ghost" className="justify-start w-full">Genre</Button>
-              <Button variant="ghost" className="justify-start w-full">Country</Button>
               <Button variant="ghost" className="justify-start w-full">Movies</Button>
               <Button variant="ghost" className="justify-start w-full">TV-Series</Button>
-              <Button variant="ghost" className="justify-start w-full">Updates</Button>
               <a href="/live-tv"><Button variant="ghost" className="justify-start w-full">IPTV</Button></a>
               <a href="/my-list"><Button variant="ghost" className="justify-start w-full">My List</Button></a>
             </nav>
