@@ -4,15 +4,15 @@
 export const movieStreamingService = {
   // Get streaming URL for movies
   getMovieStreamUrl: (tmdbId: number | string) => {
-    // VidSrc.to is a popular free streaming embed service
-    return `https://vidsrc.to/embed/movie/${tmdbId}`;
+    // VidSrc is a popular free streaming embed service
+    return `https://vidsrc.xyz/embed/movie/${tmdbId}`;
   },
 
   // Get streaming URLs for TV shows (episodes)
 getTVStreamUrls: (tmdbId: number | string, season: number = 1, episode: number = 1) => {
   const sources = [
     // ✅ Vidsrc (known to work for episodes)
-    `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}`,
+    `https://vidsrc.xyz/embed/tv/${tmdbId}/${season}/${episode}`,
 
     // ✅ Multiembed (correct episode support)
     `https://multiembed.mov/directstream.php?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`,
@@ -34,7 +34,7 @@ getTVStreamUrls: (tmdbId: number | string, season: number = 1, episode: number =
   // Alternative streaming sources (you can add more)
 getAlternativeStreamUrls: (tmdbId: number | string, type: 'movie' | 'tv') => {
   const sources = [
-    `https://vidsrc.to/embed/${type}/${tmdbId}`,
+    `https://vidsrc.xyz/embed/${type}/${tmdbId}`,
     `https://www.2embed.to/embed/tmdb/${type}?id=${tmdbId}`,
     `https://multiembed.mov/directstream.php?video_id=${tmdbId}&tmdb=1`,
     `https://embed.smashystream.xyz/${type}?tmdb=${tmdbId}`,
@@ -53,7 +53,7 @@ getAlternativeStreamUrls: (tmdbId: number | string, type: 'movie' | 'tv') => {
   isContentAvailable: async (tmdbId: number | string, type: 'movie' | 'tv'): Promise<boolean> => {
     try {
       // Simple availability check - in production you'd want more robust checking
-      const url = `https://vidsrc.to/embed/${type}/${tmdbId}`;
+      const url = `https://vidsrc.xyz/embed/${type}/${tmdbId}`;
       const response = await fetch(url, { method: 'HEAD' });
       return response.ok;
     } catch {

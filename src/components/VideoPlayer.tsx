@@ -16,7 +16,7 @@ const VideoPlayer = ({ src, isOpen, onClose }: VideoPlayerProps) => {
   const [embedSrc, setEmbedSrc] = useState("");
 
   // Detect if it's an iframe-embed-only source
-  const isIframeSrc = /youtube\.com|youtu\.be|vidsrc\.to|1asb\.com|embed/.test(src);
+  const isIframeSrc = /youtube\.com|youtu\.be|vidsrc|1asb\.com|embed/.test(src);
 
   useEffect(() => {
     if (!isOpen) return;
