@@ -4,13 +4,13 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCGJF5wV3w3OY6nqNQT5ckh_S1piDPVV6A",
-  authDomain: "streamke-bcb5a.firebaseapp.com",
-  projectId: "streamke-bcb5a",
-  storageBucket: "streamke-bcb5a.firebasestorage.app",
-  messagingSenderId: "928701825981",
-  appId: "1:928701825981:web:305b2d63280bb526b1c8d4",
-  measurementId: "G-BG5PGB8JYB"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCGJF5wV3w3OY6nqNQT5ckh_S1piDPVV6A",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "streamke-bcb5a.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "streamke-bcb5a",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "streamke-bcb5a.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "928701825981",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:928701825981:web:305b2d63280bb526b1c8d4",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-BG5PGB8JYB"
 };
 
 
