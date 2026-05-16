@@ -62,8 +62,23 @@ const Header = ({ onSearch }: HeaderProps) => {
                 <Button variant="ghost" className="text-foreground hover:text-primary">Genre</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-48 max-h-96 overflow-y-auto">
-                {['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Thriller', 'Documentary', 'Animation'].map(genre => (
-                  <DropdownMenuItem key={genre}>{genre}</DropdownMenuItem>
+                {[
+                  { id: 28, name: 'Action' },
+                  { id: 35, name: 'Comedy' },
+                  { id: 18, name: 'Drama' },
+                  { id: 27, name: 'Horror' },
+                  { id: 878, name: 'Sci-Fi' },
+                  { id: 10749, name: 'Romance' },
+                  { id: 53, name: 'Thriller' },
+                  { id: 99, name: 'Documentary' },
+                  { id: 16, name: 'Animation' }
+                ].map(genre => (
+                  <DropdownMenuItem 
+                    key={genre.id} 
+                    onClick={() => navigate(`/movies?genre=${genre.id}&name=${genre.name}`)}
+                  >
+                    {genre.name}
+                  </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -79,7 +94,9 @@ const Header = ({ onSearch }: HeaderProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button variant="ghost" className="text-foreground hover:text-primary">Movies</Button>
+            <a href="/movies">
+              <Button variant="ghost" className={`${isActive('/movies') ? 'text-primary' : 'text-foreground'} hover:text-primary`}>Movies</Button>
+            </a>
             <Button variant="ghost" className="text-foreground hover:text-primary">TV-Series</Button>
             <Button variant="ghost" className="text-foreground hover:text-primary">Updates</Button>
 

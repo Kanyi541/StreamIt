@@ -138,6 +138,15 @@ export const tmdbService = {
     return data.results.filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
   },
 
+  // Get movies by genre (sorted newest to oldest)
+  getMoviesByGenre: async (genreId: string | number): Promise<TMDBMovie[]> => {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=en-US&sort_by=primary_release_date.desc&with_genres=${genreId}&page=1`
+    );
+    const data = await response.json();
+    return data.results;
+  },
+
   // Helper to get full image URL
   getImageUrl: (path: string) => {
     return path ? `${TMDB_IMAGE_BASE_URL}${path}` : 'https://images.unsplash.com/photo-1489599856878-f99c3ba38ebd?w=500&h=750&fit=crop';

@@ -1,84 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ContentGrid from "@/components/ContentGrid";
 import VideoPlayer from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
+import { tmdbService, TMDBMovie } from "@/services/tmdb";
 
 const Movies = () => {
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const [movies, setMovies] = useState<TMDBMovie[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const allMovies = [
-    {
-      id: "1",
-      title: "The Dark Knight",
-      image: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=300&h=450&fit=crop",
-      type: "movie" as const,
-      rating: "9.0",
-      year: 2008
-    },
-    {
-      id: "2", 
-      title: "Inception",
-      image: "https://images.unsplash.com/photo-1489599456549-5d5a4dc8e4ec?w=300&h=450&fit=crop",
-      type: "movie" as const,
-      rating: "8.8",
-      year: 2010
-    },
-    {
-      id: "3",
-      title: "Avengers: Endgame", 
-      image: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=300&h=450&fit=crop",
-      type: "movie" as const,
-      rating: "8.4",
-      year: 2019
-    },
-    {
-      id: "4",
-      title: "Interstellar",
-      image: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=300&h=450&fit=crop",
-      type: "movie" as const,
-      rating: "8.6", 
-      year: 2014
-    },
-    {
-      id: "5",
-      title: "The Matrix",
-      image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=450&fit=crop",
-      type: "movie" as const,
-      rating: "8.7",
-      year: 1999
-    },
-    {
-      id: "6",
-      title: "Spider-Man: No Way Home",
-      image: "https://images.unsplash.com/photo-1635805737707-575885ab0b28?w=300&h=450&fit=crop",
-      type: "movie" as const,
-      rating: "8.2",
-      year: 2021
-    },
-    {
-      id: "7",
-      title: "Dune",
-      image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=450&fit=crop",
-      type: "movie" as const,
-      rating: "8.0",
-      year: 2021
-    },
-    {
-      id: "8",
-      title: "Top Gun: Maverick",
-      image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=300&h=450&fit=crop",
-      type: "movie" as const,
-      rating: "8.3",
-      year: 2022
-    }
-  ];
+  const genreId = searchParams.get('genre');
+  const genreName = searchParams.get('name') || "All Movies";
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        if (genreId) {
+          const fetchedMovies = await tmdbService.getMoviesByGenre(genreId);
+          setMovies(fetchedMovies);
+        } else {
+          const fetchedMovies = await tmdbService.getPopularMovies();
+          setMovies(fetchedMovies);
+        }
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMovies();
+  }, [genreId]);
 
   const handlePlayMovie = (movie: any) => {
-    setSelectedMovie(movie);
+    setSelectedMovie({ ...movie, isFromWatchlist: true, type: 'movie' });
     setIsPlayerOpen(true);
   };
+
+  const formatMovies = (moviesList: TMDBMovie[]) => moviesList.map(movie => ({
+    id: movie.id.toString(),
+    title: movie.title,
+    type: "movie" as const,
+    image: tmdbService.getImageUrl(movie.poster_path),
+    rating: movie.vote_average.toFixed(1),
+    year: movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A',
+    tmdbId: movie.id,
+    onClick: () => handlePlayMovie(movie)
+  }));
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,35 +60,38 @@ const Movies = () => {
       <div className="pt-24 pb-16">
         <div className="container mx-auto px-4">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-4">Movies</h1>
+            <h1 className="text-4xl font-bold mb-4">{genreName}</h1>
             <p className="text-muted-foreground text-lg">
-              Discover the latest blockbusters and timeless classics
+              {genreId ? `Explore the best ${genreName} movies from newest to oldest` : "Discover the latest blockbusters and timeless classics"}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-4 mb-8">
-            <Button variant="default">All Movies</Button>
-            <Button variant="outline">Action</Button>
-            <Button variant="outline">Comedy</Button>
-            <Button variant="outline">Drama</Button>
-            <Button variant="outline">Sci-Fi</Button>
-            <Button variant="outline">Horror</Button>
-            <Button variant="outline">Romance</Button>
+            <Button variant={!genreId ? "default" : "outline"} onClick={() => navigate('/movies')}>All Movies</Button>
+            <Button variant={genreId === '28' ? "default" : "outline"} onClick={() => navigate('/movies?genre=28&name=Action')}>Action</Button>
+            <Button variant={genreId === '35' ? "default" : "outline"} onClick={() => navigate('/movies?genre=35&name=Comedy')}>Comedy</Button>
+            <Button variant={genreId === '18' ? "default" : "outline"} onClick={() => navigate('/movies?genre=18&name=Drama')}>Drama</Button>
+            <Button variant={genreId === '878' ? "default" : "outline"} onClick={() => navigate('/movies?genre=878&name=Sci-Fi')}>Sci-Fi</Button>
+            <Button variant={genreId === '27' ? "default" : "outline"} onClick={() => navigate('/movies?genre=27&name=Horror')}>Horror</Button>
+            <Button variant={genreId === '10749' ? "default" : "outline"} onClick={() => navigate('/movies?genre=10749&name=Romance')}>Romance</Button>
           </div>
 
-          <ContentGrid 
-            title="All Movies" 
-            items={allMovies.map(movie => ({
-              ...movie,
-              onClick: () => handlePlayMovie(movie)
-            }))} 
-          />
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <ContentGrid 
+              title="" 
+              items={formatMovies(movies)} 
+            />
+          )}
         </div>
       </div>
 
       {selectedMovie && (
         <VideoPlayer
-          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          src={`https://vidsrc.me/embed/movie?tmdb=${selectedMovie.tmdbId || selectedMovie.id}`}
           title={selectedMovie.title}
           isOpen={isPlayerOpen}
           onClose={() => {
