@@ -140,8 +140,9 @@ export const tmdbService = {
 
   // Get movies by genre (sorted newest to oldest)
   getMoviesByGenre: async (genreId: string | number): Promise<TMDBMovie[]> => {
+    const today = new Date().toISOString().split('T')[0];
     const response = await fetch(
-      `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=en-US&sort_by=primary_release_date.desc&with_genres=${genreId}&page=1`
+      `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=en-US&sort_by=primary_release_date.desc&primary_release_date.lte=${today}&vote_count.gte=50&with_genres=${genreId}&page=1`
     );
     const data = await response.json();
     return data.results;
