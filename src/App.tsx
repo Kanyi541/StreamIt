@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Index from "./pages/Index";
 import Movies from "./pages/Movies";
+import TVSeries from "./pages/TVSeries";
 import LiveTV from "./pages/LiveTV";
 import MyList from "./pages/MyList";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/movies" element={<Movies />} />
+            <Route path="/tv-series" element={<TVSeries />} />
             <Route path="/live-tv" element={<LiveTV />} />
             <Route path="/my-list" element={<MyList />} />
             <Route path="*" element={<NotFound />} />

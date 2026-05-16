@@ -47,7 +47,7 @@ const Header = ({ onSearch }: HeaderProps) => {
               <Menu className="h-6 w-6" />
             </Button>
             <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              StreamBox
+              stream-it-mocha
             </h1>
           </div>
 
@@ -97,7 +97,32 @@ const Header = ({ onSearch }: HeaderProps) => {
             <a href="/movies">
               <Button variant="ghost" className={`${isActive('/movies') ? 'text-primary' : 'text-foreground'} hover:text-primary`}>Movies</Button>
             </a>
-            <Button variant="ghost" className="text-foreground hover:text-primary">TV-Series</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-foreground hover:text-primary">TV-Series</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 max-h-96 overflow-y-auto">
+                <DropdownMenuItem onClick={() => navigate('/tv-series')}>
+                  All TV-Series
+                </DropdownMenuItem>
+                {[
+                  { id: 10759, name: 'Action & Adventure' },
+                  { id: 16, name: 'Animation' },
+                  { id: 35, name: 'Comedy' },
+                  { id: 80, name: 'Crime' },
+                  { id: 99, name: 'Documentary' },
+                  { id: 18, name: 'Drama' },
+                  { id: 10765, name: 'Sci-Fi & Fantasy' }
+                ].map(genre => (
+                  <DropdownMenuItem 
+                    key={genre.id} 
+                    onClick={() => navigate(`/tv-series?genre=${genre.id}&name=${encodeURIComponent(genre.name)}`)}
+                  >
+                    {genre.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="ghost" className="text-foreground hover:text-primary">Updates</Button>
 
             <a href="/live-tv">

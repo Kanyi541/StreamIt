@@ -148,6 +148,16 @@ export const tmdbService = {
     return data.results;
   },
 
+  // Get TV shows by genre (sorted newest to oldest)
+  getTVShowsByGenre: async (genreId: string | number): Promise<TMDBTVShow[]> => {
+    const today = new Date().toISOString().split('T')[0];
+    const response = await fetch(
+      `${TMDB_BASE_URL}/discover/tv?api_key=${TMDB_API_KEY}&language=en-US&sort_by=first_air_date.desc&first_air_date.lte=${today}&vote_count.gte=50&with_genres=${genreId}&page=1`
+    );
+    const data = await response.json();
+    return data.results;
+  },
+
   // Helper to get full image URL
   getImageUrl: (path: string) => {
     return path ? `${TMDB_IMAGE_BASE_URL}${path}` : 'https://images.unsplash.com/photo-1489599856878-f99c3ba38ebd?w=500&h=750&fit=crop';
