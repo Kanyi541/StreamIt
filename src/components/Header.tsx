@@ -21,6 +21,28 @@ interface HeaderProps {
   onSearch?: () => void;
 }
 
+const movieGenres = [
+  { id: 28, name: 'Action' },
+  { id: 35, name: 'Comedy' },
+  { id: 18, name: 'Drama' },
+  { id: 27, name: 'Horror' },
+  { id: 878, name: 'Sci-Fi' },
+  { id: 10749, name: 'Romance' },
+  { id: 53, name: 'Thriller' },
+  { id: 99, name: 'Documentary' },
+  { id: 16, name: 'Animation' }
+];
+
+const tvGenres = [
+  { id: 10759, name: 'Action & Adventure' },
+  { id: 16, name: 'Animation' },
+  { id: 35, name: 'Comedy' },
+  { id: 80, name: 'Crime' },
+  { id: 99, name: 'Documentary' },
+  { id: 18, name: 'Drama' },
+  { id: 10765, name: 'Sci-Fi & Fantasy' }
+];
+
 const Header = ({ onSearch }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -67,17 +89,7 @@ const Header = ({ onSearch }: HeaderProps) => {
                 <Button variant="ghost" className="text-foreground hover:text-primary">Genre</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-48 max-h-96 overflow-y-auto">
-                {[
-                  { id: 28, name: 'Action' },
-                  { id: 35, name: 'Comedy' },
-                  { id: 18, name: 'Drama' },
-                  { id: 27, name: 'Horror' },
-                  { id: 878, name: 'Sci-Fi' },
-                  { id: 10749, name: 'Romance' },
-                  { id: 53, name: 'Thriller' },
-                  { id: 99, name: 'Documentary' },
-                  { id: 16, name: 'Animation' }
-                ].map(genre => (
+                {movieGenres.map(genre => (
                   <DropdownMenuItem 
                     key={genre.id} 
                     onClick={() => navigate(`/movies?genre=${genre.id}&name=${genre.name}`)}
@@ -99,15 +111,7 @@ const Header = ({ onSearch }: HeaderProps) => {
                 <DropdownMenuItem onClick={() => navigate('/tv-series')}>
                   All TV-Series
                 </DropdownMenuItem>
-                {[
-                  { id: 10759, name: 'Action & Adventure' },
-                  { id: 16, name: 'Animation' },
-                  { id: 35, name: 'Comedy' },
-                  { id: 80, name: 'Crime' },
-                  { id: 99, name: 'Documentary' },
-                  { id: 18, name: 'Drama' },
-                  { id: 10765, name: 'Sci-Fi & Fantasy' }
-                ].map(genre => (
+                {tvGenres.map(genre => (
                   <DropdownMenuItem 
                     key={genre.id} 
                     onClick={() => navigate(`/tv-series?genre=${genre.id}&name=${encodeURIComponent(genre.name)}`)}
@@ -184,16 +188,10 @@ const Header = ({ onSearch }: HeaderProps) => {
               </Tooltip>
 
               {user && (
-                <DropdownMenuContent align="end" className="w-48">
-                  <div className="px-2 py-1.5 text-xs text-muted-foreground border-b border-border mb-1 truncate">
-                    {user.email}
-                  </div>
+                <DropdownMenuContent align="end" className="w-40">
                   <DropdownMenuItem onClick={handleSignOut}>
                     Sign Out
                   </DropdownMenuItem>
-                  <div className="px-2 py-1.5 text-[10px] text-muted-foreground/50 text-right mt-1">
-                    v1.3.5
-                  </div>
                 </DropdownMenuContent>
               )}
             </DropdownMenu>
@@ -203,17 +201,60 @@ const Header = ({ onSearch }: HeaderProps) => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 border-t border-border">
-            <nav className="flex flex-col space-y-2 pt-4 max-h-64 overflow-y-auto">
-              <a href="/" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">Home</Button></a>
-              <a href="/movies" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">Movies</Button></a>
-              <a href="/tv-series" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">TV-Series</Button></a>
-              <a href="/live-tv" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">IPTV</Button></a>
-              <a href="/my-list" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" className="justify-start w-full">My List</Button></a>
+            <nav className="flex flex-col space-y-2 pt-4 max-h-[70vh] overflow-y-auto">
+              <a href="/"><Button variant="ghost" className="justify-start w-full" onClick={() => setIsMenuOpen(false)}>Home</Button></a>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="justify-start w-full text-foreground hover:text-primary">Genre</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48 max-h-96 overflow-y-auto">
+                  {movieGenres.map(genre => (
+                    <DropdownMenuItem 
+                      key={genre.id} 
+                      onClick={() => {
+                        navigate(`/movies?genre=${genre.id}&name=${genre.name}`);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      {genre.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <a href="/movies">
+                <Button variant="ghost" className="justify-start w-full" onClick={() => setIsMenuOpen(false)}>Movies</Button>
+              </a>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="justify-start w-full text-foreground hover:text-primary">TV-Series</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48 max-h-96 overflow-y-auto">
+                  <DropdownMenuItem onClick={() => {
+                    navigate('/tv-series');
+                    setIsMenuOpen(false);
+                  }}>
+                    All TV-Series
+                  </DropdownMenuItem>
+                  {tvGenres.map(genre => (
+                    <DropdownMenuItem 
+                      key={genre.id} 
+                      onClick={() => {
+                        navigate(`/tv-series?genre=${genre.id}&name=${encodeURIComponent(genre.name)}`);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      {genre.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <a href="/live-tv"><Button variant="ghost" className="justify-start w-full" onClick={() => setIsMenuOpen(false)}>IPTV</Button></a>
+              <a href="/my-list"><Button variant="ghost" className="justify-start w-full" onClick={() => setIsMenuOpen(false)}>My List</Button></a>
             </nav>
-            <div className="mt-4 pt-4 border-t border-border flex justify-between items-center px-4">
-              <span className="text-xs text-muted-foreground">stream-it-mocha v1.3.5</span>
-              {user && <span className="text-xs text-muted-foreground truncate max-w-[150px]">{user.email}</span>}
-            </div>
           </div>
         )}
       </div>
