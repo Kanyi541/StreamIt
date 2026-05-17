@@ -125,7 +125,7 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
   }, [activeStreamUrl, isOpen]);
 
   useEffect(() => {
-    if (!isOpen || !tvShowId) return;
+    if (!isOpen || !tvShowId || !isTV) return;
 
     const fetchTVDetails = async () => {
       try {
