@@ -20,16 +20,25 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
   const [season, setSeason] = useState(1);
   const [episode, setEpisode] = useState(1);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [seasonsData, setSeasonsData] = useState<any[]>([]);
+  const [maxSeasons, setMaxSeasons] = useState(1);
+  const [maxEpisodes, setMaxEpisodes] = useState(1);
 
   // Detect if it's an iframe-embed-only source
   const isIframeSrc = /youtube\.com|youtu\.be|vidsrc|1asb\.com|embed/.test(src);
   const isTV = src.includes('vidsrc.me/embed/tv');
+
+  const tmdbIdMatch = src.match(/[?&]tmdb=([^&]+)/);
+  const tvShowId = tmdbIdMatch ? Number(tmdbIdMatch[1]) : null;
 
   useEffect(() => {
     if (!isOpen) {
       setSeason(1);
       setEpisode(1);
       setIsMaximized(false);
+      setSeasonsData([]);
+      setMaxSeasons(1);
+      setMaxEpisodes(1);
       return;
     }
 
@@ -95,6 +104,42 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
     }
   }, [src, isOpen, season, episode]);
 
+  useEffect(() => {
+    if (!isOpen || !tvShowId) return;
+
+    const fetchTVDetails = async () => {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/tv/${tvShowId}?api_key=07093a6aaed5e454e20052e4ce3ebf5c&language=en-US`
+        );
+        const data = await response.json();
+        if (data.seasons && data.seasons.length > 0) {
+          const validSeasons = data.seasons.filter((s: any) => s.season_number > 0);
+          setSeasonsData(validSeasons);
+          setMaxSeasons(validSeasons.length);
+          
+          const s1 = validSeasons.find((s: any) => s.season_number === 1) || validSeasons[0];
+          setMaxEpisodes(s1?.episode_count || 1);
+        }
+      } catch (err) {
+        console.error("Error fetching TV details:", err);
+      }
+    };
+
+    fetchTVDetails();
+  }, [tvShowId, isOpen]);
+
+  useEffect(() => {
+    if (seasonsData.length > 0) {
+      const currentSeasonInfo = seasonsData.find((s: any) => s.season_number === season);
+      const epCount = currentSeasonInfo?.episode_count || 1;
+      setMaxEpisodes(epCount);
+      if (episode > epCount) {
+        setEpisode(1);
+      }
+    }
+  }, [season, seasonsData]);
+
   const handlePlayPause = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -136,16 +181,24 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
               onChange={(e) => setSeason(Number(e.target.value))}
               className="bg-black/80 text-white px-3 py-1.5 rounded border border-white/20 focus:outline-none focus:border-primary text-sm backdrop-blur-sm"
             >
-              {[...Array(20)].map((_, i) => (
-                <option key={i+1} value={i+1}>Season {i+1}</option>
-              ))}
+              {seasonsData.length > 0 ? (
+                seasonsData.map((s) => (
+                  <option key={s.season_number} value={s.season_number}>
+                    Season {s.season_number}
+                  </option>
+                ))
+              ) : (
+                [...Array(maxSeasons)].map((_, i) => (
+                  <option key={i+1} value={i+1}>Season {i+1}</option>
+                ))
+              )}
             </select>
             <select 
               value={episode} 
               onChange={(e) => setEpisode(Number(e.target.value))}
               className="bg-black/80 text-white px-3 py-1.5 rounded border border-white/20 focus:outline-none focus:border-primary text-sm backdrop-blur-sm"
             >
-              {[...Array(50)].map((_, i) => (
+              {[...Array(maxEpisodes)].map((_, i) => (
                 <option key={i+1} value={i+1}>Episode {i+1}</option>
               ))}
             </select>
