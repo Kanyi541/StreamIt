@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Pause, Play } from "lucide-react";
+import { X, Pause, Play, Maximize2, Minimize2 } from "lucide-react";
 import Hls from "hls.js";
 import { analytics } from "@/firebase";
 import { logEvent } from "firebase/analytics";
@@ -19,6 +19,7 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
   const [embedSrc, setEmbedSrc] = useState("");
   const [season, setSeason] = useState(1);
   const [episode, setEpisode] = useState(1);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // Detect if it's an iframe-embed-only source
   const isIframeSrc = /youtube\.com|youtu\.be|vidsrc|1asb\.com|embed/.test(src);
@@ -28,6 +29,7 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
     if (!isOpen) {
       setSeason(1);
       setEpisode(1);
+      setIsMaximized(false);
       return;
     }
 
@@ -109,8 +111,12 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4">
-      <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
+    <div className={`fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center transition-all duration-300 ${isMaximized ? "p-0" : "p-4"}`}>
+      <div className={`relative bg-black transition-all duration-300 overflow-hidden ${
+        isMaximized 
+          ? "w-full h-full max-w-none rounded-none" 
+          : "w-full max-w-4xl aspect-video rounded-lg"
+      }`}>
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center text-white text-lg">
             Loading stream...
@@ -176,10 +182,19 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
           </button>
         )}
 
+        {/* Maximize Button */}
+        <button
+          onClick={() => setIsMaximized(!isMaximized)}
+          className="absolute top-4 right-16 bg-black bg-opacity-60 text-white p-2 rounded-full hover:bg-opacity-80 transition-colors"
+          title={isMaximized ? "Minimize Player" : "Maximize Player"}
+        >
+          {isMaximized ? <Minimize2 size={24} /> : <Maximize2 size={24} />}
+        </button>
+
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 bg-black bg-opacity-60 text-white p-2 rounded-full"
+          className="absolute top-4 right-4 bg-black bg-opacity-60 text-white p-2 rounded-full hover:bg-opacity-80 transition-colors"
         >
           <X size={24} />
         </button>
