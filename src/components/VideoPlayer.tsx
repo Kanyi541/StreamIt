@@ -23,13 +23,36 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
   const [seasonsData, setSeasonsData] = useState<any[]>([]);
   const [maxSeasons, setMaxSeasons] = useState(1);
   const [maxEpisodes, setMaxEpisodes] = useState(1);
+  const [selectedServer, setSelectedServer] = useState(0);
 
   // Detect if it's an iframe-embed-only source
   const isIframeSrc = /youtube\.com|youtu\.be|vidsrc|1asb\.com|embed/.test(src);
   const isTV = src.includes('vidsrc.me/embed/tv');
 
-  const tmdbIdMatch = src.match(/[?&]tmdb=([^&]+)/);
-  const tvShowId = tmdbIdMatch ? Number(tmdbIdMatch[1]) : null;
+  const idMatch = src.match(/[?&](?:tmdb|id)=([^&]+)/) || src.match(/embed\/(?:movie|tv)\/([^/?&#]+)/);
+  const contentId = idMatch ? idMatch[1] : null;
+  const tvShowId = contentId ? Number(contentId) : null;
+
+  const tvSources = contentId 
+    ? [
+        `https://vidsrc.me/embed/tv?tmdb=${contentId}&season=${season}&episode=${episode}`,
+        `https://multiembed.mov/directstream.php?video_id=${contentId}&tmdb=1&s=${season}&e=${episode}`,
+        `https://www.2embed.to/embed/tmdb/tv?id=${contentId}&s=${season}&e=${episode}`,
+        `https://embed.smashystream.xyz/tv?tmdb=${contentId}&season=${season}&episode=${episode}`,
+      ]
+    : [];
+
+  const movieSources = contentId
+    ? [
+        `https://vidsrc.me/embed/movie?tmdb=${contentId}`,
+        `https://multiembed.mov/directstream.php?video_id=${contentId}&tmdb=1`,
+        `https://www.2embed.to/embed/tmdb/movie?id=${contentId}`,
+        `https://embed.smashystream.xyz/movie?tmdb=${contentId}`,
+      ]
+    : [src];
+
+  const sources = isTV ? tvSources : movieSources;
+  const activeStreamUrl = sources.length > 0 ? (sources[selectedServer] || sources[0]) : src;
 
   useEffect(() => {
     if (!isOpen) {
@@ -39,13 +62,14 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
       setSeasonsData([]);
       setMaxSeasons(1);
       setMaxEpisodes(1);
+      setSelectedServer(0);
       return;
     }
 
     if (analytics) {
       logEvent(analytics, 'select_content', {
         content_type: isTV ? 'tv_show' : 'movie',
-        content_id: src,
+        content_id: activeStreamUrl,
         item_name: title || 'Unknown Content',
         season: isTV ? season : undefined,
         episode: isTV ? episode : undefined,
@@ -57,15 +81,11 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
 
     if (isIframeSrc) {
       // Handle YouTube links
-      const youtubeMatch = src.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+      const youtubeMatch = activeStreamUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
       const videoId = youtubeMatch?.[1];
-      let embedUrl = videoId
+      const embedUrl = videoId
         ? `https://www.youtube.com/embed/${videoId}?autoplay=1`
-        : src;
-
-      if (embedUrl.includes('vidsrc.me/embed/tv')) {
-        embedUrl = embedUrl.replace(/&season=\d+&episode=\d+/, `&season=${season}&episode=${episode}`);
-      }
+        : activeStreamUrl;
 
       setEmbedSrc(embedUrl);
       setIsLoading(false);
@@ -77,11 +97,11 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
     const video = videoRef.current;
 
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = src;
+      video.src = activeStreamUrl;
       video.oncanplay = () => setIsLoading(false);
     } else if (Hls.isSupported()) {
       const hls = new Hls();
-      hls.loadSource(src);
+      hls.loadSource(activeStreamUrl);
       hls.attachMedia(video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -102,7 +122,7 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
       console.error("HLS not supported in this browser");
       setHasError(true);
     }
-  }, [src, isOpen, season, episode]);
+  }, [activeStreamUrl, isOpen]);
 
   useEffect(() => {
     if (!isOpen || !tvShowId) return;
@@ -153,6 +173,16 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
     }
   };
 
+  // Conditionally configure sandbox parameters.
+  // Server 1 (Vidsrc) requires allow-top-navigation & allow-popups, otherwise it displays "Media unavailable".
+  // Servers 2, 3, and 4 work beautifully under a strict sandbox, blocking all popups and redirects 100%!
+  const getSandboxString = () => {
+    if (selectedServer === 0) {
+      return "allow-scripts allow-same-origin allow-presentation allow-forms allow-top-navigation allow-popups";
+    }
+    return "allow-scripts allow-same-origin allow-presentation allow-forms";
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -176,6 +206,17 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
 
         {isTV && !hasError && (
           <div className="absolute top-4 left-4 z-50 flex gap-2">
+            <select 
+              value={selectedServer} 
+              onChange={(e) => setSelectedServer(Number(e.target.value))}
+              className="bg-black/80 text-white px-3 py-1.5 rounded border border-white/20 focus:outline-none focus:border-primary text-sm backdrop-blur-sm"
+              title="Switch Server Source"
+            >
+              <option value={0}>Server 1 (VidSrc)</option>
+              <option value={1}>Server 2 (MultiEmbed)</option>
+              <option value={2}>Server 3 (2Embed)</option>
+              <option value={3}>Server 4 (SmashyStream)</option>
+            </select>
             <select 
               value={season} 
               onChange={(e) => setSeason(Number(e.target.value))}
@@ -205,13 +246,29 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
           </div>
         )}
 
+        {!isTV && !hasError && isIframeSrc && contentId && (
+          <div className="absolute top-4 left-4 z-50 flex gap-2">
+            <select 
+              value={selectedServer} 
+              onChange={(e) => setSelectedServer(Number(e.target.value))}
+              className="bg-black/80 text-white px-3 py-1.5 rounded border border-white/20 focus:outline-none focus:border-primary text-sm backdrop-blur-sm"
+              title="Switch Server Source"
+            >
+              <option value={0}>Server 1 (VidSrc)</option>
+              <option value={1}>Server 2 (MultiEmbed)</option>
+              <option value={2}>Server 3 (2Embed)</option>
+              <option value={3}>Server 4 (SmashyStream)</option>
+            </select>
+          </div>
+        )}
+
         {!hasError && isIframeSrc && (
           <iframe
             src={embedSrc}
             title="Embedded Stream"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
+            sandbox={getSandboxString()}
             className="w-full h-full border-none"
           />
         )}
