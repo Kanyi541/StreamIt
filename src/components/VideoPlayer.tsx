@@ -158,6 +158,7 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
             title="Embedded Stream"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
             className="w-full h-full border-none"
           />
         )}
