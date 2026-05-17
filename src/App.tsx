@@ -13,6 +13,7 @@ import Movies from "./pages/Movies";
 import TVSeries from "./pages/TVSeries";
 import LiveTV from "./pages/LiveTV";
 import MyList from "./pages/MyList";
+import AuthAction from "./pages/AuthAction";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ function App() {
             <Route path="/tv-series" element={<TVSeries />} />
             <Route path="/live-tv" element={<LiveTV />} />
             <Route path="/my-list" element={<MyList />} />
+            <Route path="/auth-action" element={<AuthAction />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

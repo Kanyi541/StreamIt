@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   sendEmailVerification,
   signOut,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, provider } from "./firebase";
@@ -29,6 +30,14 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const [checkingVerification, setCheckingVerification] = useState(false);
   const [manuallyVerified, setManuallyVerified] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [sendingResetEmail, setSendingResetEmail] = useState(false);
+
+  // Strong password requirements check
+  const hasMinLength = password.length >= 8;
+  const hasUpperLower = /[A-Z]/.test(password) && /[a-z]/.test(password);
+  const hasNumSpecial = /[0-9]/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const isPasswordStrong = hasMinLength && hasUpperLower && hasNumSpecial;
 
   // Handle resend email cooldown timer
   useEffect(() => {
@@ -119,6 +128,30 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError("");
+    setAuthSuccess("");
+    setSendingResetEmail(true);
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setAuthSuccess(
+        "A password reset link has been sent to your email. Please check your inbox to reset your password."
+      );
+    } catch (err: any) {
+      let msg = err.message;
+      if (err.code === "auth/user-not-found") {
+        msg = "No account found with this email address.";
+      } else if (err.code === "auth/invalid-email") {
+        msg = "Please enter a valid email address.";
+      }
+      setAuthError(msg);
+    } finally {
+      setSendingResetEmail(false);
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     setAuthError("");
     setAuthSuccess("");
@@ -185,8 +218,95 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // If not logged in, render the Register / Sign In screen
+  // If not logged in, render the Register / Sign In / Forgot Password screen
   if (!user) {
+    if (showForgotPassword) {
+      return (
+        <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-950 via-zinc-950 to-black flex items-center justify-center p-4 relative overflow-hidden">
+          {/* Glow ambient effects */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-[120px] pointer-events-none" />
+
+          <div className="w-full max-w-md bg-zinc-950/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-8 shadow-2xl relative z-10 hover:border-zinc-700/80 transition-all duration-500 text-white">
+            <div className="flex flex-col items-center mb-8">
+              <div className="h-12 w-12 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg shadow-primary/20 mb-3 animate-pulse">
+                <Tv className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="text-3xl font-extrabold tracking-tight bg-gradient-primary bg-clip-text text-transparent">
+                stream-it-mocha
+              </h2>
+              <p className="text-zinc-400 text-sm mt-1 text-center font-medium">
+                Reset your password
+              </p>
+            </div>
+
+            {authError && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl flex items-start gap-2.5 mb-4 text-sm animate-shake">
+                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                <span>{authError}</span>
+              </div>
+            )}
+
+            {authSuccess && (
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl flex items-start gap-2.5 mb-4 text-sm animate-fade-in">
+                <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
+                <span>{authSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-5 w-5" />
+                  <input
+                    type="email"
+                    placeholder="name@example.com"
+                    className="w-full pl-10 pr-4 py-3 bg-zinc-900/60 border border-zinc-800 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-sm"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={sendingResetEmail}
+                className="w-full bg-gradient-primary text-white py-3 rounded-xl hover:opacity-90 font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/35 transition-all duration-300 flex items-center justify-center gap-2 text-sm mt-6 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {sendingResetEmail ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Sending Reset Link...
+                  </>
+                ) : (
+                  "Send Reset Link"
+                )}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-zinc-400">
+              Remember your password?{" "}
+              <button
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setAuthError("");
+                  setAuthSuccess("");
+                }}
+                className="text-primary hover:text-purple-400 font-semibold hover:underline cursor-pointer"
+              >
+                Back to Sign In
+              </button>
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-950 via-zinc-950 to-black flex items-center justify-center p-4 relative overflow-hidden">
         {/* Glow ambient effects */}
@@ -240,9 +360,24 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
-                Password
-              </label>
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
+                  Password
+                </label>
+                {!isRegister && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotPassword(true);
+                      setAuthError("");
+                      setAuthSuccess("");
+                    }}
+                    className="text-xs font-semibold text-primary hover:text-purple-400 hover:underline cursor-pointer"
+                  >
+                    Forgot Password?
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-5 w-5" />
                 <input
@@ -257,9 +392,37 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
 
+            {/* Real-time Password Strength Criteria Panel (Only shown on signup) */}
+            {isRegister && (
+              <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-3.5 space-y-2 text-xs text-white">
+                <p className="font-semibold text-zinc-400 uppercase tracking-wider text-[10px] mb-1.5">
+                  Password Requirements:
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className={`h-1.5 w-1.5 rounded-full ${hasMinLength ? "bg-emerald-500" : "bg-zinc-600"}`} />
+                  <span className={hasMinLength ? "text-emerald-400 font-medium" : "text-zinc-500"}>
+                    At least 8 characters
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`h-1.5 w-1.5 rounded-full ${hasUpperLower ? "bg-emerald-500" : "bg-zinc-600"}`} />
+                  <span className={hasUpperLower ? "text-emerald-400 font-medium" : "text-zinc-500"}>
+                    Uppercase & lowercase letters
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`h-1.5 w-1.5 rounded-full ${hasNumSpecial ? "bg-emerald-500" : "bg-zinc-600"}`} />
+                  <span className={hasNumSpecial ? "text-emerald-400 font-medium" : "text-zinc-500"}>
+                    Numbers & special characters (!@#$ etc.)
+                  </span>
+                </div>
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full bg-gradient-primary text-white py-3 rounded-xl hover:opacity-90 font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/35 transition-all duration-300 flex items-center justify-center gap-2 text-sm mt-6 cursor-pointer"
+              disabled={isRegister && !isPasswordStrong}
+              className="w-full bg-gradient-primary text-white py-3 rounded-xl hover:opacity-90 font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/35 transition-all duration-300 flex items-center justify-center gap-2 text-sm mt-6 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isRegister ? "Create Free Account" : "Sign In"}
             </button>
