@@ -38,6 +38,55 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     }
   }, [cooldown]);
 
+  // Polling for email verification status in the background to automatically grant access
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (user) {
+      const isGoogleUser = user.providerData.some((p) => p.providerId === "google.com");
+      const isUserVerified = user.emailVerified || manuallyVerified || isGoogleUser;
+
+      if (!isUserVerified) {
+        intervalId = setInterval(async () => {
+          try {
+            await user.reload();
+            if (auth.currentUser?.emailVerified) {
+              setManuallyVerified(true);
+              setAuthSuccess("Email verified successfully! Loading your dashboard...");
+              clearInterval(intervalId);
+            }
+          } catch (err) {
+            console.error("Error polling verification status:", err);
+          }
+        }, 3000); // Check every 3 seconds
+      }
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [user, manuallyVerified]);
+
+  // Handle immediate verification email trigger after registration (prevents React race conditions)
+  useEffect(() => {
+    if (user) {
+      const isGoogleUser = user.providerData.some((p) => p.providerId === "google.com");
+      if (!user.emailVerified && !isGoogleUser && localStorage.getItem("just_registered") === "true") {
+        localStorage.removeItem("just_registered");
+        sendEmailVerification(user)
+          .then(() => {
+            setAuthSuccess(
+              "Account created successfully! A verification link has been sent to your email. Please verify it to start streaming."
+            );
+          })
+          .catch((err: any) => {
+            console.error("Error sending verification email on registration:", err);
+            setAuthError("Account created, but failed to send verification email: " + err.message);
+          });
+      }
+    }
+  }, [user]);
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError("");
@@ -45,17 +94,16 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
     try {
       if (isRegister) {
-        // Step 1 & 2: Create user and send verification email immediately
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await sendEmailVerification(userCredential.user);
-        setAuthSuccess(
-          "Account created successfully! A verification link has been sent to your email. Please verify it to log in."
-        );
+        // Set the registration flag in localStorage to safely handle the race condition in the useEffect
+        localStorage.setItem("just_registered", "true");
+        await createUserWithEmailAndPassword(auth, email, password);
       } else {
         // Log in user
         await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (err: any) {
+      // Clean up localStorage flag if registration fails
+      localStorage.removeItem("just_registered");
       // Map Firebase auth errors to readable terms
       let msg = err.message;
       if (err.code === "auth/invalid-credential") {
