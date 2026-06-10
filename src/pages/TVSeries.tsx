@@ -92,7 +92,7 @@ const TVSeries = () => {
 
       {selectedShow && (
         <VideoPlayer
-          src={`https://vidsrc.me/embed/tv?tmdb=${selectedShow.tmdbId || selectedShow.id}&season=1&episode=1`}
+          src={`https://vsembed.su/embed/tv?tmdb=${selectedShow.tmdbId || selectedShow.id}&season=1&episode=1`}
           title={selectedShow.title || selectedShow.name}
           isOpen={isPlayerOpen}
           onClose={() => {

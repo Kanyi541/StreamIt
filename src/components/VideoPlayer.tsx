@@ -23,7 +23,7 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
 
   // Detect if it's an iframe-embed-only source
   const isIframeSrc = /youtube\.com|youtu\.be|vidsrc|1asb\.com|embed/.test(src);
-  const isTV = src.includes('vidsrc.me/embed/tv');
+  const isTV = src.includes('vsembed.su/embed/tv');
 
   useEffect(() => {
     if (!isOpen) {
@@ -54,7 +54,7 @@ const VideoPlayer = ({ src, title, isOpen, onClose }: VideoPlayerProps) => {
         ? `https://www.youtube.com/embed/${videoId}?autoplay=1`
         : src;
 
-      if (embedUrl.includes('vidsrc.me/embed/tv')) {
+      if (embedUrl.includes('vsembed.su/embed/tv')) {
         embedUrl = embedUrl.replace(/&season=\d+&episode=\d+/, `&season=${season}&episode=${episode}`);
       }
 

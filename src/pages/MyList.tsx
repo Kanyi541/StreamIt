@@ -61,8 +61,8 @@ const MyList = () => {
             selectedContent.type === 'live'
               ? selectedContent.streamUrl
               : (selectedContent.type === 'tv' || selectedContent.media_type === 'tv'
-                  ? `https://vidsrc.me/embed/tv?tmdb=${selectedContent.tmdbId || selectedContent.id}&season=1&episode=1`
-                  : `https://vidsrc.me/embed/movie?tmdb=${selectedContent.tmdbId || selectedContent.id}`)
+                  ? `https://vsembed.su/embed/tv?tmdb=${selectedContent.tmdbId || selectedContent.id}&season=1&episode=1`
+                  : `https://vsembed.su/embed/movie?tmdb=${selectedContent.tmdbId || selectedContent.id}`)
           }
           title={selectedContent.title}
           isOpen={isPlayerOpen}

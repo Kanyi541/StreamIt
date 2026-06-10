@@ -91,7 +91,7 @@ const Movies = () => {
 
       {selectedMovie && (
         <VideoPlayer
-          src={`https://vidsrc.me/embed/movie?tmdb=${selectedMovie.tmdbId || selectedMovie.id}`}
+          src={`https://vsembed.su/embed/movie?tmdb=${selectedMovie.tmdbId || selectedMovie.id}`}
           title={selectedMovie.title}
           isOpen={isPlayerOpen}
           onClose={() => {
